@@ -1,4 +1,4 @@
-package domain
+package page
 
 import (
 	"errors"
@@ -8,12 +8,13 @@ import (
 
 type Page struct {
 	ID        uuid.UUID
+	SiteID    uuid.UUID
 	Type      PageType
 	Heading   PageHeading
 	CreatedAt uuid.UUID
 }
 
-func NewPage(id uuid.UUID, t PageType) Page {
+func NewPage(id uuid.UUID, t PageType, siteID uuid.UUID) Page {
 	return Page{}
 }
 

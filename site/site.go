@@ -1,4 +1,4 @@
-package domain
+package site
 
 import (
 	"time"
@@ -21,16 +21,4 @@ func NewSite(url SiteURL, name SiteName, ownerID uuid.UUID) Site {
 		Name:    name,
 		OwnerID: ownerID,
 	}
-}
-
-type SiteURL string
-
-func NewSiteURL(url string) SiteURL {
-	return SiteURL(url)
-}
-
-type SiteName string
-
-func NewSiteName(name string) SiteName {
-	return SiteName(name)
 }
