@@ -8,17 +8,22 @@ import (
 
 type Site struct {
 	ID        uuid.UUID
-	URL       SiteURL
-	Name      SiteName
+	URL       URL
+	Name      Name
 	Active    bool
 	OwnerID   uuid.UUID
+	Status    Status
 	CreatedAt time.Time
 }
 
-func NewSite(url SiteURL, name SiteName, ownerID uuid.UUID) Site {
+func New(url URL, name Name, ownerID uuid.UUID) Site {
 	return Site{
-		URL:     url,
-		Name:    name,
-		OwnerID: ownerID,
+		ID:        uuid.New(),
+		URL:       url,
+		Name:      name,
+		OwnerID:   ownerID,
+		Active:    true,
+		Status:    StatusDevelopment,
+		CreatedAt: time.Now().UTC(),
 	}
 }

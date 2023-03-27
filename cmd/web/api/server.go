@@ -7,19 +7,24 @@ import (
 	siteservice "github.com/samverrall/sitesmiths-api/internal/site"
 )
 
-type NewServerArgs struct {
-	Port        string
-	SiteService *siteservice.Service
+type API struct {
+	port        string
+	siteService *siteservice.Service
 }
 
-func NewServer(args NewServerArgs) *http.Server {
-	r := gin.Default()
+func New(siteSvc *siteservice.Service, port string) *API {
+	return &API{
+		siteService: siteSvc,
+		port:        port,
+	}
+}
 
-	siteControllers := newSiteControllers(args.SiteService)
+func (api *API) NewServer() *http.Server {
+	r := gin.Default()
 
 	// Site Routes
 	sitesRoutes := r.Group("/api/sites")
-	sitesRoutes.POST("/", siteControllers.CreateSite)
+	sitesRoutes.POST("/", api.CreateSite)
 	///////////////////////
 
 	// User routes

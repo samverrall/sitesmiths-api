@@ -15,8 +15,10 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/samverrall/sitesmiths-api/cmd/web/api"
-	"github.com/samverrall/sitesmiths-api/cmd/web/internal/repo/postgres"
+	"github.com/samverrall/sitesmiths-api/cmd/web/internal/repo/mongodb"
 	siteservice "github.com/samverrall/sitesmiths-api/internal/site"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var opts struct {
@@ -25,6 +27,10 @@ var opts struct {
 	}
 }
 
+const (
+	sitesCollection = "sites"
+)
+
 func main() {
 	flag.StringVar(&opts.http.port, "http-port", "8000", "Port for the HTTP server to listen")
 
@@ -32,23 +38,39 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	pgxConn := newDB(ctx)
+	// Set client options
+
+	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
+	clientOptions := options.Client().
+		ApplyURI(os.Getenv("MONGO_DB_URL")).
+		SetServerAPIOptions(serverAPIOptions)
+
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatal("failed to connect to mongo: %w", err)
+	}
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal("failed to ping mongo: %w", err)
+	}
+
+	database := client.Database(os.Getenv("MONGO_DB_NAME"))
 
 	// Init repo implementations
-	siteRepo := postgres.NewSiteRepo(pgxConn)
+	siteRepo := mongodb.NewSiteRepo(database.Collection(sitesCollection))
 
 	// Init core application layer
 	siteService := siteservice.New(siteRepo)
 
-	srv := api.NewServer(api.NewServerArgs{
-		Port:        opts.http.port,
-		SiteService: siteService,
-	})
+	api := api.New(siteService, opts.http.port)
+
+	srv := api.NewServer()
 
 	// Start the server on a separate Goroutine
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("ListenAndServe(): %s\n", err)
+			log.Fatalf("ListenAndServe(): %s\n", err.Error())
 		}
 	}()
 
@@ -60,7 +82,7 @@ func main() {
 
 	// Shut down the server gracefully
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server shutdown failed: %s\n", err)
+		log.Fatalf("Server shutdown failed: %s\n", err.Error())
 	}
 
 	// Do any cleanup or shutdown tasks

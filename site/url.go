@@ -1,7 +1,11 @@
 package site
 
-type SiteURL string
+type URL string
 
-func NewSiteURL(url string) SiteURL {
-	return SiteURL(url)
+func NewURL(url string) URL {
+	return URL(url)
+}
+
+func (u URL) String() string {
+	return string(u)
 }

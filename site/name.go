@@ -1,7 +1,11 @@
 package site
 
-type SiteName string
+type Name string
 
-func NewSiteName(name string) SiteName {
-	return SiteName(name)
+func NewName(name string) Name {
+	return Name(name)
+}
+
+func (n Name) String() string {
+	return string(n)
 }
