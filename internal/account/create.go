@@ -2,6 +2,7 @@ package account
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/samverrall/sitesmiths-api/account"
@@ -21,13 +22,13 @@ func (s *Service) CreateFromProvider(ctx context.Context, p CreatePayload) error
 		return internal.WrapErr(internal.ErrBadRequest, err)
 	}
 
-	// If the provider is valid, try to authenticate to get account details
-	// from the provider.
 	code, err := authenticator.NewAuthCode(p.Code)
 	if err != nil {
 		return internal.WrapErr(internal.ErrBadRequest, err)
 	}
 
+	// If the provider is valid and we have a valid auth code, try to authenticate
+	// to get account details from the provider.
 	token, err := s.authenticator.GetTokenFromCode(ctx, code)
 	if err != nil {
 		return internal.WrapErr(internal.ErrInternal, err) // TODO: handle this correctly
@@ -40,8 +41,7 @@ func (s *Service) CreateFromProvider(ctx context.Context, p CreatePayload) error
 
 	// Check an account with email doesn't already exist
 	_, err = s.repo.GetByEmail(ctx, accountDetails.Email)
-	switch {
-	case err != nil:
+	if err != nil && !errors.Is(err, account.ErrNotFound) {
 		return internal.WrapErr(internal.ErrInternal, err)
 	}
 
