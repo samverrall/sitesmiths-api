@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	siteservice "github.com/samverrall/sitesmiths-api/internal/site"
+	"github.com/samverrall/sitesmiths-api/internal/site"
 )
 
 func (a *API) CreateSite(c *gin.Context) {
@@ -23,7 +23,7 @@ func (a *API) CreateSite(c *gin.Context) {
 		return
 	}
 
-	err := a.siteService.Create(ctx, siteservice.CreatePayload{
+	err := a.siteService.Create(ctx, site.CreatePayload{
 		Name:    payload.Name,
 		URL:     payload.URL,
 		OwnerID: payload.OwnerID,

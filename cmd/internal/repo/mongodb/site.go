@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/samverrall/sitesmiths-api/cmd/web/internal/repo/mongodb/internal"
+	"github.com/samverrall/sitesmiths-api/cmd/internal/repo/mongodb/internal"
 	"github.com/samverrall/sitesmiths-api/site"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

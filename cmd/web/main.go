@@ -14,9 +14,9 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/samverrall/sitesmiths-api/cmd/internal/repo/mongodb"
 	"github.com/samverrall/sitesmiths-api/cmd/web/api"
-	"github.com/samverrall/sitesmiths-api/cmd/web/internal/repo/mongodb"
-	siteservice "github.com/samverrall/sitesmiths-api/internal/site"
+	"github.com/samverrall/sitesmiths-api/internal/site"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -61,7 +61,7 @@ func main() {
 	siteRepo := mongodb.NewSiteRepo(database.Collection(sitesCollection))
 
 	// Init core application layer
-	siteService := siteservice.New(siteRepo)
+	siteService := site.New(siteRepo)
 
 	api := api.New(siteService, opts.http.port)
 

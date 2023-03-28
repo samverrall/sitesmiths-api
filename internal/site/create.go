@@ -1,4 +1,4 @@
-package siteservice
+package site
 
 import (
 	"context"
