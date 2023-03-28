@@ -1,6 +1,13 @@
 package account
 
-import "context"
+import (
+	"context"
+	"errors"
+)
+
+var (
+	ErrNotFound = errors.New("no account found")
+)
 
 type Repo interface {
 	Add(ctx context.Context, a Account) error

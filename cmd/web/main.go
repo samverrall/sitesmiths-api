@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"flag"
 	"fmt"
@@ -61,7 +60,7 @@ func main() {
 	siteRepo := mongodb.NewSiteRepo(database.Collection(sitesCollection))
 
 	// Init core application layer
-	siteService := site.New(siteRepo)
+	siteService := site.NewService(siteRepo)
 
 	api := api.New(siteService, opts.http.port)
 
@@ -87,15 +86,4 @@ func main() {
 
 	// Do any cleanup or shutdown tasks
 	fmt.Println("Server stopped.")
-}
-
-func newDB(ctx context.Context) *sql.DB {
-	const driver = "postgres"
-	db, err := sql.Open(driver, os.Getenv("DB_URL"))
-	if err != nil {
-		//log.Fatalf("failed to connect to postgres: %s", err.Error())
-		log.Println(err.Error())
-	}
-
-	return db
 }

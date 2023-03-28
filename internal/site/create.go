@@ -2,7 +2,6 @@ package site
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/samverrall/sitesmiths-api/internal"
@@ -22,12 +21,12 @@ func (s *Service) Create(ctx context.Context, p CreatePayload) error {
 
 	ownerID, err := uuid.Parse(p.OwnerID)
 	if err != nil {
-		return fmt.Errorf("%w: %s", internal.ErrBadRequest, err.Error())
+		return internal.WrapErr(internal.ErrBadRequest, err)
 	}
 
 	site := site.New(siteURL, siteName, ownerID)
 	if err := s.repo.Add(ctx, site); err != nil {
-		return fmt.Errorf("%w: %s", internal.ErrInternal, err.Error())
+		return internal.WrapErr(internal.ErrInternal, err)
 	}
 
 	return nil
