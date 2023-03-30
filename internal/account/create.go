@@ -10,6 +10,10 @@ import (
 	"github.com/samverrall/sitesmiths-api/internal"
 )
 
+var (
+	ErrAccountExists = errors.New("account already exists")
+)
+
 type CreatePayload struct {
 	Code     string
 	Provider string
@@ -19,30 +23,34 @@ func (s *Service) CreateFromProvider(ctx context.Context, p CreatePayload) error
 	// Check the provider is valid (google etc)
 	provider, err := account.NewProvider(p.Provider)
 	if err != nil {
-		return internal.WrapErr(internal.ErrBadRequest, err)
+		return errors.Join(internal.ErrBadRequest, err)
 	}
 
 	code, err := authenticator.NewAuthCode(p.Code)
 	if err != nil {
-		return internal.WrapErr(internal.ErrBadRequest, err)
+		return errors.Join(internal.ErrBadRequest, err)
 	}
 
 	// If the provider is valid and we have a valid auth code, try to authenticate
 	// to get account details from the provider.
 	token, err := s.authenticator.GetTokenFromCode(ctx, code)
 	if err != nil {
-		return internal.WrapErr(internal.ErrInternal, err) // TODO: handle this correctly
+		return errors.Join(internal.ErrInternal, err)
 	}
 
 	accountDetails, err := s.authenticator.GetDetailsFromToken(ctx, token)
 	if err != nil {
-		return internal.WrapErr(internal.ErrInternal, err) // TODO: handle this correctly
+		return errors.Join(internal.ErrInternal, err)
 	}
 
 	// Check an account with email doesn't already exist
-	_, err = s.repo.GetByEmail(ctx, accountDetails.Email)
-	if err != nil && !errors.Is(err, account.ErrNotFound) {
-		return internal.WrapErr(internal.ErrInternal, err)
+	existingAccount, err := s.repo.GetByEmail(ctx, accountDetails.Email)
+	switch {
+	case err != nil && !errors.Is(err, account.ErrNotFound):
+		return errors.Join(internal.ErrInternal, err)
+
+	case existingAccount.Active:
+		return errors.Join(internal.ErrInternal, ErrAccountExists)
 	}
 
 	// Create a new account
@@ -50,7 +58,7 @@ func (s *Service) CreateFromProvider(ctx context.Context, p CreatePayload) error
 
 	// Add new account to repo
 	if err := s.repo.Add(ctx, acc); err != nil {
-		return internal.WrapErr(internal.ErrInternal, err)
+		return errors.Join(internal.ErrInternal, err)
 	}
 
 	return nil
