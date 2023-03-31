@@ -1,46 +1,30 @@
 package page
 
 import (
-	"errors"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/samverrall/sitesmiths-api/pkg/aggregate"
 )
 
 type Page struct {
+	aggregate.Root
+
 	ID        uuid.UUID
 	SiteID    uuid.UUID
-	Type      PageType
-	Heading   PageHeading
-	CreatedAt uuid.UUID
+	Type      Type
+	Heading   Heading
+	Content   Content
+	CreatedAt time.Time
 }
 
-func NewPage(id uuid.UUID, t PageType, siteID uuid.UUID) Page {
-	return Page{}
-}
-
-type PageType string
-
-var pageTypes = map[string]struct{}{
-	"about":   {},
-	"home":    {},
-	"contact": {},
-}
-
-func NewPageType(t string) (PageType, error) {
-	_, ok := pageTypes[t]
-	if !ok {
-		return "", errors.New("invalid page type")
+func NewPage(id uuid.UUID, heading Heading, content Content, pageType Type, siteID uuid.UUID) Page {
+	return Page{
+		ID:        id,
+		Type:      pageType,
+		Heading:   heading,
+		Content:   content,
+		SiteID:    siteID,
+		CreatedAt: time.Now().UTC(),
 	}
-	return PageType(t), nil
-
-}
-
-type PageHeading string
-
-func NewPageHeading(h string) (PageHeading, error) {
-	if h == "" {
-		return "", errors.New("invalid page heading")
-	}
-	return PageHeading(h), nil
-
 }

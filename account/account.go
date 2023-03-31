@@ -4,9 +4,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samverrall/sitesmiths-api/pkg/aggregate"
 )
 
 type Account struct {
+	aggregate.Root
+
 	ID        uuid.UUID
 	Provider  Provider
 	Name      Name

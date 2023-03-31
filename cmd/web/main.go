@@ -13,8 +13,10 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/samverrall/sitesmiths-api/cmd/internal/repo/google"
 	"github.com/samverrall/sitesmiths-api/cmd/internal/repo/mongodb"
 	"github.com/samverrall/sitesmiths-api/cmd/web/api"
+	"github.com/samverrall/sitesmiths-api/internal/account"
 	"github.com/samverrall/sitesmiths-api/internal/site"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -58,11 +60,15 @@ func main() {
 
 	// Init repo implementations
 	siteRepo := mongodb.NewSiteRepo(database.Collection(sitesCollection))
+	// TODO: Add account mongodb repo here
+
+	authenticatorRepo := google.NewAuthenticator()
 
 	// Init core application layer
 	siteService := site.NewService(siteRepo)
+	accountService := account.NewService(nil, authenticatorRepo)
 
-	api := api.New(siteService, opts.http.port)
+	api := api.New(siteService, accountService, opts.http.port)
 
 	srv := api.NewServer()
 

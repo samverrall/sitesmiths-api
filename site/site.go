@@ -4,9 +4,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samverrall/sitesmiths-api/pkg/aggregate"
 )
 
 type Site struct {
+	aggregate.Root
+
 	ID        uuid.UUID
 	URL       URL
 	Name      Name
@@ -26,4 +29,8 @@ func New(url URL, name Name, ownerID uuid.UUID) Site {
 		Status:    StatusDevelopment,
 		CreatedAt: time.Now().UTC(),
 	}
+}
+
+func (s Site) IsStatusDevelopment() bool {
+	return s.Status == StatusDevelopment
 }

@@ -5,18 +5,21 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/samverrall/sitesmiths-api/internal/account"
 	"github.com/samverrall/sitesmiths-api/internal/site"
 )
 
 type API struct {
-	port        string
-	siteService *site.Service
+	port           string
+	siteService    *site.Service
+	accountService *account.Service
 }
 
-func New(siteSvc *site.Service, port string) *API {
+func New(siteSvc *site.Service, accountSvc *account.Service, port string) *API {
 	return &API{
-		siteService: siteSvc,
-		port:        port,
+		siteService:    siteSvc,
+		accountService: accountSvc,
+		port:           port,
 	}
 }
 
