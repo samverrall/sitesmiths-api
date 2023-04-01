@@ -35,6 +35,8 @@ const (
 func main() {
 	flag.StringVar(&opts.http.port, "http-port", "8000", "Port for the HTTP server to listen")
 
+	// TODO: Parse config
+
 	// Create a context with a timeout of 5 seconds
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -48,25 +50,25 @@ func main() {
 
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Fatal("failed to connect to mongo: %w", err)
+		log.Fatalf("failed to connect to mongo: %s", err.Error())
 	}
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		log.Fatal("failed to ping mongo: %w", err)
+		log.Fatalf("failed to ping mongo: %s", err.Error())
 	}
 
 	database := client.Database(os.Getenv("MONGO_DB_NAME"))
 
 	// Init repo implementations
 	siteRepo := mongodb.NewSiteRepo(database.Collection(sitesCollection))
-	// TODO: Add account mongodb repo here
+	accountRepo := mongodb.NewAccountRepo(database)
 
-	authenticatorRepo := google.NewAuthenticator()
+	authenticatorRepo := google.NewAuthenticator("TODO", "TODO", "TODO")
 
 	// Init core application layer
 	siteService := site.NewService(siteRepo)
-	accountService := account.NewService(nil, authenticatorRepo)
+	accountService := account.NewService(accountRepo, authenticatorRepo)
 
 	api := api.New(siteService, accountService, opts.http.port)
 

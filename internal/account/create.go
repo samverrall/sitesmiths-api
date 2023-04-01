@@ -14,12 +14,14 @@ var (
 	ErrAccountExists = errors.New("account already exists")
 )
 
-type CreatePayload struct {
+// CreateFromProviderPayload defines a primative seriaisable payload with fields
+// required for the CreateFromProvider method.
+type CreateFromProviderPayload struct {
 	Code     string
 	Provider string
 }
 
-func (s *Service) CreateFromProvider(ctx context.Context, p CreatePayload) error {
+func (s *Service) CreateFromProvider(ctx context.Context, p CreateFromProviderPayload) error {
 	// Check the provider is valid (google etc)
 	provider, err := account.NewProvider(p.Provider)
 	if err != nil {

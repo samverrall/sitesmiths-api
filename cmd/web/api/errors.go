@@ -9,15 +9,21 @@ import (
 )
 
 type Error struct {
+	Err     error
 	Message string
 	Detail  string
 }
 
-func writeError(c *gin.Context, statusCode int, e Error) {
+func writeError(c *gin.Context, statusCode int, e Error) bool {
+	if e.Err == nil {
+		return false
+	}
+
 	c.JSON(statusCode, gin.H{
 		"error":  e.Message,
 		"detail": e.Detail,
 	})
+	return true
 }
 
 func writeServiceError(c *gin.Context, err error) bool {

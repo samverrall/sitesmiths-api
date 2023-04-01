@@ -28,7 +28,7 @@ func TestCreateFromProvider(t *testing.T) {
 	svc := NewService(repo, authMock)
 
 	t.Run("invalid provider returns invalid provider error", func(t *testing.T) {
-		err := svc.CreateFromProvider(ctx, CreatePayload{
+		err := svc.CreateFromProvider(ctx, CreateFromProviderPayload{
 			Provider: "invalid",
 			Code:     validCode.String(),
 		})
@@ -43,7 +43,7 @@ func TestCreateFromProvider(t *testing.T) {
 	})
 
 	t.Run("empty code returns empty code error", func(t *testing.T) {
-		err := svc.CreateFromProvider(ctx, CreatePayload{
+		err := svc.CreateFromProvider(ctx, CreateFromProviderPayload{
 			Provider: account.GoogleProvider.String(),
 			Code:     "",
 		})
@@ -68,7 +68,7 @@ func TestCreateFromProvider(t *testing.T) {
 		}
 		authMock.EXPECT().GetDetailsFromToken(ctx, token).Return(&acc, nil)
 
-		err := svc.CreateFromProvider(ctx, CreatePayload{
+		err := svc.CreateFromProvider(ctx, CreateFromProviderPayload{
 			Provider: account.GoogleProvider.String(),
 			Code:     validCode.String(),
 		})
@@ -88,7 +88,7 @@ func TestCreateFromProvider(t *testing.T) {
 		}
 		authMock.EXPECT().GetDetailsFromToken(ctx, token).Return(&acc, nil)
 
-		err := svc.CreateFromProvider(ctx, CreatePayload{
+		err := svc.CreateFromProvider(ctx, CreateFromProviderPayload{
 			Provider: account.GoogleProvider.String(),
 			Code:     validCode.String(),
 		})

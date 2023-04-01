@@ -22,7 +22,7 @@ func (a *API) CreateAccountFromProvider(c *gin.Context) {
 		return
 	}
 
-	err := a.accountService.CreateFromProvider(ctx, account.CreatePayload{
+	err := a.accountService.CreateFromProvider(ctx, account.CreateFromProviderPayload{
 		Provider: payload.Code,
 		Code:     payload.Code,
 	})

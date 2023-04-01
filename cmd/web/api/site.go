@@ -15,20 +15,21 @@ func (a *API) CreateSite(c *gin.Context) {
 		URL     string `json:"url"`
 		OwnerID string `json:"ownerId"`
 	}
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		writeError(c, http.StatusBadRequest, Error{
-			Message: "Invalid site payload supplied",
-			Detail:  err.Error(),
-		})
+	err := c.ShouldBindJSON(&payload)
+	if writeError(c, http.StatusBadRequest, Error{
+		Err:     err,
+		Message: "Invalid site payload supplied",
+		Detail:  err.Error(),
+	}) {
 		return
 	}
 
-	err := a.siteService.Create(ctx, site.CreatePayload{
+	err = a.siteService.Create(ctx, site.CreatePayload{
 		Name:    payload.Name,
 		URL:     payload.URL,
 		OwnerID: payload.OwnerID,
 	})
-	if stop := writeServiceError(c, err); stop {
+	if writeServiceError(c, err) {
 		return
 	}
 
