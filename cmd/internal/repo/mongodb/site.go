@@ -27,13 +27,14 @@ func NewSiteRepo(siteCollection *mongo.Collection) *SiteRepo {
 
 func (r *SiteRepo) Add(ctx context.Context, s site.Site) error {
 	site := internal.Site{
-		ID:        s.ID.String(),
-		URL:       string(s.URL.String()),
-		Name:      s.Name.String(),
-		Active:    s.Active,
-		OwnerID:   s.OwnerID.String(),
-		Status:    s.Status.String(),
-		CreatedAt: s.CreatedAt.UTC(),
+		ID:          s.ID.String(),
+		URL:         string(s.URL.String()),
+		Description: s.Description.String(),
+		Name:        s.Name.String(),
+		Active:      s.Active,
+		OwnerID:     s.OwnerID.String(),
+		Status:      s.Status.String(),
+		CreatedAt:   s.CreatedAt.UTC(),
 	}
 	_, err := r.collection.InsertOne(ctx, site)
 	if err != nil {
@@ -59,12 +60,13 @@ func (r *SiteRepo) Get(ctx context.Context, id uuid.UUID) (*site.Site, error) {
 
 func fromSiteModel(model *internal.Site) *site.Site {
 	return &site.Site{
-		ID:        uuid.MustParse(model.ID),
-		URL:       site.URL(model.URL),
-		Name:      site.Name(model.Name),
-		Active:    model.Active,
-		OwnerID:   uuid.MustParse(model.OwnerID),
-		Status:    site.Status(model.Status),
-		CreatedAt: model.CreatedAt,
+		ID:          uuid.MustParse(model.ID),
+		URL:         site.URL(model.URL),
+		Name:        site.Name(model.Name),
+		Description: site.Description(model.Description),
+		Active:      model.Active,
+		OwnerID:     uuid.MustParse(model.OwnerID),
+		Status:      site.Status(model.Status),
+		CreatedAt:   model.CreatedAt,
 	}
 }

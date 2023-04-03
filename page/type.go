@@ -1,19 +1,36 @@
 package page
 
-import "errors"
+import (
+	"errors"
+)
+
+var (
+	ErrInvalidPageType = errors.New("invalid page type supplied")
+)
 
 type Type string
 
+const (
+	TypeHome    Type = "home"
+	TypeAbout   Type = "about"
+	TypeContact Type = "contact"
+)
+
 var pageTypes = map[string]struct{}{
-	"about":   {},
-	"home":    {},
-	"contact": {},
+	TypeHome.String():    {},
+	TypeAbout.String():   {},
+	TypeContact.String(): {},
 }
 
-func NewPageType(t string) (Type, error) {
+func NewType(t string) (Type, error) {
 	_, ok := pageTypes[t]
 	if !ok {
-		return "", errors.New("invalid page type")
+		return "", ErrInvalidPageType
 	}
+
 	return Type(t), nil
+}
+
+func (t Type) String() string {
+	return string(t)
 }

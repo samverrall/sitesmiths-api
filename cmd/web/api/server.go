@@ -5,21 +5,27 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/samverrall/sitesmiths-api/cmd/web/api/jwt"
 	"github.com/samverrall/sitesmiths-api/internal/account"
 	"github.com/samverrall/sitesmiths-api/internal/site"
 )
 
 type API struct {
+	insecure       bool
 	port           string
 	siteService    *site.Service
 	accountService *account.Service
+	jwtTokens      *jwt.JWTToken
 }
 
-func New(siteSvc *site.Service, accountSvc *account.Service, port string) *API {
+func New(siteSvc *site.Service, accountSvc *account.Service, port string, insecure bool) *API {
 	return &API{
 		siteService:    siteSvc,
 		accountService: accountSvc,
 		port:           port,
+		jwtTokens: jwt.New(10, "access-token-secret", "refresh-token-secret", &jwt.Config{
+			Insecure: insecure,
+		}),
 	}
 }
 
@@ -32,7 +38,8 @@ func (api *API) NewServer() *http.Server {
 	///////////////////////
 
 	// User routes
-	//userRoutes:= r.Group("/api/users")
+	userRoutes := r.Group("/api/users")
+	userRoutes.POST("/", api.CreateAccountFromProvider)
 	///////////////////////
 
 	// Create a new HTTP server with the Gin router as the handler

@@ -16,9 +16,10 @@ type Page struct {
 	Heading   Heading
 	Content   Content
 	CreatedAt time.Time
+	CreatedBy uuid.UUID
 }
 
-func NewPage(id uuid.UUID, heading Heading, content Content, pageType Type, siteID uuid.UUID) Page {
+func New(id uuid.UUID, heading Heading, content Content, pageType Type, siteID, createdBy uuid.UUID) Page {
 	return Page{
 		ID:        id,
 		Type:      pageType,
@@ -26,5 +27,6 @@ func NewPage(id uuid.UUID, heading Heading, content Content, pageType Type, site
 		Content:   content,
 		SiteID:    siteID,
 		CreatedAt: time.Now().UTC(),
+		CreatedBy: createdBy,
 	}
 }

@@ -10,3 +10,7 @@ func NewHeading(h string) (Heading, error) {
 	}
 	return Heading(h), nil
 }
+
+func (h Heading) String() string {
+	return string(h)
+}

@@ -21,47 +21,48 @@ type CreateFromProviderPayload struct {
 	Provider string
 }
 
-func (s *Service) CreateFromProvider(ctx context.Context, p CreateFromProviderPayload) error {
+func (s *Service) CreateFromProvider(ctx context.Context, p CreateFromProviderPayload) (string, error) {
 	// Check the provider is valid (google etc)
 	provider, err := account.NewProvider(p.Provider)
 	if err != nil {
-		return errors.Join(internal.ErrBadRequest, err)
+		return "", errors.Join(internal.ErrBadRequest, err)
 	}
 
 	code, err := authenticator.NewAuthCode(p.Code)
 	if err != nil {
-		return errors.Join(internal.ErrBadRequest, err)
+		return "", errors.Join(internal.ErrBadRequest, err)
 	}
 
 	// If the provider is valid and we have a valid auth code, try to authenticate
 	// to get account details from the provider.
 	token, err := s.authenticator.GetTokenFromCode(ctx, code)
 	if err != nil {
-		return errors.Join(internal.ErrInternal, err)
+		return "", errors.Join(internal.ErrInternal, err)
 	}
 
 	accountDetails, err := s.authenticator.GetDetailsFromToken(ctx, token)
 	if err != nil {
-		return errors.Join(internal.ErrInternal, err)
+		return "", errors.Join(internal.ErrInternal, err)
 	}
 
 	// Check an account with email doesn't already exist
 	existingAccount, err := s.repo.GetByEmail(ctx, accountDetails.Email)
 	switch {
 	case err != nil && !errors.Is(err, account.ErrNotFound):
-		return errors.Join(internal.ErrInternal, err)
+		return "", errors.Join(internal.ErrInternal, err)
 
 	case existingAccount.Active:
-		return errors.Join(internal.ErrInternal, ErrAccountExists)
+		return "", errors.Join(internal.ErrInternal, ErrAccountExists)
 	}
 
 	// Create a new account
-	acc := account.New(uuid.New(), accountDetails.Name, accountDetails.Email, provider)
+	accountID := uuid.New()
+	acc := account.New(accountID, accountDetails.Name, accountDetails.Email, provider)
 
 	// Add new account to repo
 	if err := s.repo.Add(ctx, acc); err != nil {
-		return errors.Join(internal.ErrInternal, err)
+		return "", errors.Join(internal.ErrInternal, err)
 	}
 
-	return nil
+	return accountID.String(), nil
 }

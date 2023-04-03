@@ -16,11 +16,7 @@ func (a *API) CreateSite(c *gin.Context) {
 		OwnerID string `json:"ownerId"`
 	}
 	err := c.ShouldBindJSON(&payload)
-	if writeError(c, http.StatusBadRequest, Error{
-		Err:     err,
-		Message: "Invalid site payload supplied",
-		Detail:  err.Error(),
-	}) {
+	if writeError(c, http.StatusBadRequest, err, "Invalid site payload supplied") {
 		return
 	}
 
