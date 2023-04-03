@@ -10,24 +10,26 @@ import (
 type Site struct {
 	aggregate.Root
 
-	ID        uuid.UUID
-	URL       URL
-	Name      Name
-	Active    bool
-	OwnerID   uuid.UUID
-	Status    Status
-	CreatedAt time.Time
+	ID          uuid.UUID
+	URL         URL
+	Name        Name
+	Active      bool
+	Description Description
+	OwnerID     uuid.UUID
+	Status      Status
+	CreatedAt   time.Time
 }
 
-func New(url URL, name Name, ownerID uuid.UUID) Site {
+func New(url URL, name Name, desc Description, ownerID uuid.UUID) Site {
 	return Site{
-		ID:        uuid.New(),
-		URL:       url,
-		Name:      name,
-		OwnerID:   ownerID,
-		Active:    true,
-		Status:    StatusDevelopment,
-		CreatedAt: time.Now().UTC(),
+		ID:          uuid.New(),
+		URL:         url,
+		Name:        name,
+		Description: desc,
+		OwnerID:     ownerID,
+		Active:      true,
+		Status:      StatusDevelopment,
+		CreatedAt:   time.Now().UTC(),
 	}
 }
 

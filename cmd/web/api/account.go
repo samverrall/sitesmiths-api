@@ -14,15 +14,12 @@ func (a *API) CreateAccountFromProvider(c *gin.Context) {
 		Code     string `json:"code"`
 		Provider string `json:"provider"`
 	}
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		writeError(c, http.StatusBadRequest, Error{
-			Message: "Invalid site payload supplied",
-			Detail:  err.Error(),
-		})
+	err := c.ShouldBindJSON(&payload)
+	if stop := writeError(c, http.StatusBadRequest, err, "Invalid site payload supplied"); stop {
 		return
 	}
 
-	err := a.accountService.CreateFromProvider(ctx, account.CreateFromProviderPayload{
+	accountID, err := a.accountService.CreateFromProvider(ctx, account.CreateFromProviderPayload{
 		Provider: payload.Code,
 		Code:     payload.Code,
 	})
@@ -30,6 +27,12 @@ func (a *API) CreateAccountFromProvider(c *gin.Context) {
 		return
 	}
 
+	token, err := a.jwtTokens.CreateTokenPair(ctx, accountID)
+	if stop := writeError(c, http.StatusInternalServerError, err, "Failed to create token pair"); stop {
+		return
+	}
+
+	a.jwtTokens.WriteCookie(c, token.AccessToken)
 	c.Status(http.StatusCreated)
 	return
 }

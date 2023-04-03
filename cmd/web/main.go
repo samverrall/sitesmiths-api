@@ -24,7 +24,8 @@ import (
 
 var opts struct {
 	http struct {
-		port string
+		port     string
+		insecure bool
 	}
 }
 
@@ -70,7 +71,7 @@ func main() {
 	siteService := site.NewService(siteRepo)
 	accountService := account.NewService(accountRepo, authenticatorRepo)
 
-	api := api.New(siteService, accountService, opts.http.port)
+	api := api.New(siteService, accountService, opts.http.port, opts.http.insecure)
 
 	srv := api.NewServer()
 

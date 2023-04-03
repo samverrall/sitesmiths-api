@@ -14,14 +14,14 @@ type Error struct {
 	Detail  string
 }
 
-func writeError(c *gin.Context, statusCode int, e Error) bool {
-	if e.Err == nil {
+func writeError(c *gin.Context, statusCode int, err error, message string) bool {
+	if err == nil {
 		return false
 	}
 
 	c.JSON(statusCode, gin.H{
-		"error":  e.Message,
-		"detail": e.Detail,
+		"error":  message,
+		"detail": err.Error(),
 	})
 	return true
 }
