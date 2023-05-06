@@ -4,6 +4,8 @@ import "github.com/gin-gonic/gin"
 
 const (
 	CookieName = "__Host-token"
+	MaxAge     = 1000
+	HttpOnly   = true
 )
 
 type Config struct {
@@ -11,5 +13,5 @@ type Config struct {
 }
 
 func (jt *JWTToken) WriteCookie(c *gin.Context, token string) {
-	c.SetCookie(CookieName, token, 1000, "/", "", !jt.config.Insecure, true)
+	c.SetCookie(CookieName, token, MaxAge, "/", "", !jt.config.Insecure, HttpOnly)
 }

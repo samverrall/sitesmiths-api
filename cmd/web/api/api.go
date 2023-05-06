@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/samverrall/sitesmiths-api/cmd/web/api/jwt"
+	"github.com/samverrall/sitesmiths-api/cmd/web/api/middleware"
 	"github.com/samverrall/sitesmiths-api/internal/account"
 	"github.com/samverrall/sitesmiths-api/internal/site"
 )
@@ -31,6 +32,8 @@ func New(siteSvc *site.Service, accountSvc *account.Service, port string, insecu
 
 func (api *API) NewServer() *http.Server {
 	r := gin.Default()
+
+	r.Use(middleware.JWTAuthenticate())
 
 	// Site Routes
 	sitesRoutes := r.Group("/api/sites")
